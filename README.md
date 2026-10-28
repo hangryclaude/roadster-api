@@ -107,8 +107,11 @@ The Roadster's flight commands are not an exception. They route to one tool, `ro
 
 ## The film
 
-`ad/roadster.mp4` will be added when the cut is final. Poster: `ad/poster.png`.
-Storyboard: [ad/STORYBOARD.md](ad/STORYBOARD.md). It is a concept film and says so on the end card.
+<p align="center"><a href="ad/roadster.mp4"><img src="ad/poster.png" width="820" alt="The Roadster landed on a rooftop pad at dusk"></a></p>
+
+[ad/roadster.mp4](ad/roadster.mp4): 61 seconds, 16:9, no voice. Text the car "land on the roof", watch it leave the traffic behind, count the hours.
+Storyboard: [ad/STORYBOARD.md](ad/STORYBOARD.md). Made with Veo 3.1 and Nano Banana on Higgsfield, Chrome-rendered screens, Sonilo music.
+It is a concept film and says so on the end card: the flight commands await Tesla's endpoints.
 
 ## Layout
 
