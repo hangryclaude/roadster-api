@@ -1,0 +1,17 @@
+node_modules/
+.env
+.env.*
+*.log
+.DS_Store
+data/*.db
+dist/
+
+# freetessie: EC keypair + signing-proxy TLS pair, never committed (see docs/FREETESSIE_SETUP.md)
+keys/
+*.pem
+freetessie.db
+# freetessie-proxy.sh clones teslamotors/vehicle-command here to build tesla-http-proxy
+.freetessie-proxy-src/
+# roadster-api additions: data/ holds the committed demo dataset; only databases are ignored
+*.db
+*.sqlite

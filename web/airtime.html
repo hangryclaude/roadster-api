@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Airtime</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; height: 100%; background: #000; color: #fff;
+    font-family: -apple-system, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; }
+  #map { position: fixed; inset: 0; background: #000; }
+  .leaflet-container { background: #000; }
+  .leaflet-tile { filter: brightness(0.55) contrast(1.25) saturate(0.4); }
+  .leaflet-control-attribution { background: rgba(0,0,0,.6); color: #777; font-size: 10px; }
+  .leaflet-control-attribution a { color: #999; }
+  .hud { position: fixed; left: 48px; bottom: 48px; z-index: 500; pointer-events: none;
+    text-shadow: 0 2px 24px rgba(0,0,0,.9); }
+  .hud .q { font-size: 20px; font-weight: 500; letter-spacing: -0.01em; color: rgba(255,255,255,.72); margin: 0 0 6px; }
+  .hud .n { font-size: 112px; line-height: 1; font-weight: 600; letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums; margin: 0; }
+  .hud .n small { font-size: 36px; font-weight: 500; letter-spacing: -0.02em; margin-left: 10px; color: rgba(255,255,255,.8); }
+  .hud .sub { font-size: 15px; color: rgba(255,255,255,.5); margin: 14px 0 0; letter-spacing: -0.005em; }
+  .hud svg { display: block; margin-top: 18px; overflow: visible; }
+  .top { position: fixed; top: 40px; left: 48px; z-index: 500; font-size: 15px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,.55); }
+  @media (max-width: 720px) {
+    .hud { left: 20px; bottom: 28px; } .hud .n { font-size: 64px; } .hud .n small { font-size: 22px; }
+    .top { left: 20px; top: 20px; }
+  }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="top">Airtime</div>
+<div class="hud">
+  <p class="q">Hours saved flying over traffic</p>
+  <p class="n"><span id="hours">0</span><small id="unit">hours</small></p>
+  <p class="sub" id="sub"></p>
+  <svg id="spark" width="260" height="36"></svg>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="airtime-data.js"></script>
+<script>
+(async function () {
+  // Prefer the fresh JSON over a static server; fall back to the .js copy on file://.
+  let data = window.AIRTIME;
+  try { const r = await fetch("airtime-data.json"); if (r.ok) data = await r.json(); } catch {}
+  if (!data) { document.getElementById("sub").textContent = "Run: npm run airtime -- --demo"; return; }
+
+  // Esri's World Dark Gray Canvas needs no API key (CARTO's dark tiles do, since 2026).
+  const map = L.map("map", { zoomControl: false, attributionControl: true });
+  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+    attribution: 'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Esri, DeLorme, NAVTEQ',
+    maxZoom: 16,
+  }).addTo(map);
+
+  const feats = data.arcs.features;
+  const pts = feats.flatMap(f => f.geometry.coordinates.map(([lng, lat]) => [lat, lng]));
+  if (pts.length) map.fitBounds(L.latLngBounds(pts), { padding: [60, 60] }); else map.setView([34.05, -118.25], 10);
+
+  // Bend each straight line into a shallow quadratic arc that bows to the right of travel
+  // (so A→B and B→A separate), and draw it point by point over ~1.6 s, staggered so the map
+  // fills up visibly. The bend is computed in a local planar frame (lng scaled by cos lat)
+  // so it looks perpendicular on screen instead of sheared.
+  const STEPS = 48;
+  function arcPoints(a, b) {
+    const lat0 = (a[0] + b[0]) / 2, k = Math.cos((lat0 * Math.PI) / 180);
+    const ax = a[1] * k, ay = a[0], bx = b[1] * k, by = b[0];
+    const vx = bx - ax, vy = by - ay, len = Math.hypot(vx, vy) || 1;
+    const bulge = len * 0.18;
+    const cx = (ax + bx) / 2 + (vy / len) * bulge, cy = (ay + by) / 2 - (vx / len) * bulge;
+    const out = [];
+    for (let i = 0; i <= STEPS; i++) {
+      const t = i / STEPS, u = 1 - t;
+      const x = u * u * ax + 2 * u * t * cx + t * t * bx;
+      const y = u * u * ay + 2 * u * t * cy + t * t * by;
+      out.push([y, x / k]);
+    }
+    return out;
+  }
+  const arcs = feats.map((f, i) => {
+    const [a, b] = f.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+    const w = 0.9 + Math.min(1.4, f.properties.saved_s / 3600);
+    return { pts: arcPoints(a, b), start: i * 70, dur: 1600, w,
+      line: L.polyline([], { color: "#fff", weight: w, opacity: 0.5, lineCap: "round" }).addTo(map),
+      glow: L.polyline([], { color: "#fff", weight: w * 5, opacity: 0.06, lineCap: "round" }).addTo(map),
+      dot: L.circleMarker(b, { radius: 0, color: "#fff", fillColor: "#fff", fillOpacity: 0.9, weight: 0 }).addTo(map) };
+  });
+
+  const total = data.summary.totals.savedHours;
+  const hoursEl = document.getElementById("hours");
+  const countDur = Math.min(6000, 1200 + arcs.length * 70 + 1600);
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  let t0 = null;
+  function frame(now) {
+    if (t0 === null) t0 = now;
+    const el = now - t0;
+    for (const a of arcs) {
+      const p = Math.max(0, Math.min(1, (el - a.start) / a.dur));
+      const n = Math.round(ease(p) * STEPS);
+      a.line.setLatLngs(a.pts.slice(0, n + 1));
+      a.glow.setLatLngs(a.pts.slice(0, n + 1));
+      if (p >= 1) a.dot.setRadius(2.2);
+    }
+    const c = Math.min(1, el / countDur);
+    hoursEl.textContent = Math.round(ease(c) * total).toLocaleString("en-US");
+    if (el < countDur + 200 || arcs.some(a => el < a.start + a.dur)) requestAnimationFrame(frame);
+    else { hoursEl.textContent = Math.round(total).toLocaleString("en-US"); document.body.dataset.done = "1"; }
+  }
+  requestAnimationFrame(frame);
+
+  const s = data.summary;
+  document.getElementById("sub").textContent =
+    `${s.totals.drives} drives · ${Math.round(s.totals.km).toLocaleString("en-US")} km straight-line · ` +
+    `assumes ${s.assumptions.cruiseKph} km/h cruise + ${s.assumptions.overheadSeconds} s per flight (hypothetical)`;
+
+  // Weekly sparkline of hours saved.
+  const svg = document.getElementById("spark");
+  const W = 260, H = 36, weeks = s.weeks;
+  if (weeks.length > 1) {
+    const max = Math.max(...weeks.map(w => w.savedSeconds)) || 1;
+    const x = i => (i / (weeks.length - 1)) * (W - 4) + 2;
+    const y = v => H - 2 - (v / max) * (H - 6);
+    const d = weeks.map((w, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(w.savedSeconds).toFixed(1)}`).join(" ");
+    svg.innerHTML =
+      `<path d="${d}" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>` +
+      weeks.map((w, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(w.savedSeconds).toFixed(1)}" r="2" fill="#fff"/>`).join("") +
+      `<text x="2" y="${H + 12}" fill="rgba(255,255,255,.4)" font-size="10">${weeks[0].week}</text>` +
+      `<text x="${W - 2}" y="${H + 12}" fill="rgba(255,255,255,.4)" font-size="10" text-anchor="end">${weeks[weeks.length - 1].week}</text>`;
+  }
+})();
+</script>
+</body>
+</html>

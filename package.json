@@ -1,0 +1,35 @@
+{
+  "name": "roadster-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test --import tsx test/",
+    "dev": "tsx src/index.ts",
+    "e2e": "tsx scripts/e2e.ts",
+    "freetessie:setup": "tsx scripts/freetessie-setup.ts",
+    "freetessie:proxy": "bash scripts/freetessie-proxy.sh",
+    "airtime": "tsx scripts/airtime.ts",
+    "codex:review": "bash scripts/codex-review.sh"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
+    "@hono/node-server": "^1.19.6",
+    "grammy": "^1.40.0",
+    "hono": "^4.10.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "x-deps-why": {
+    "hono": "HTTP server per ARCHITECTURE.md",
+    "@hono/node-server": "Hono's Node adapter",
+    "@anthropic-ai/sdk": "agent tool-use loop, model claude-sonnet-5",
+    "grammy": "Telegram bot framework per ARCHITECTURE.md",
+    "tsx": "run/test TypeScript without a separate build step",
+    "typescript": "the language"
+  }
+}
