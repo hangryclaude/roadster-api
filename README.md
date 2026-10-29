@@ -1,34 +1,40 @@
-<div align="center">
+<p align="center"><img src="docs/hero-title.png" width="900" alt="Roadster API — Text your Tesla"></p>
 
-# 🚗 Roadster API
+<p align="center">A self-hosted API key for your Tesla, and an assistant you text.<br>Roadster, Cybertruck, S, 3, X, Y.</p>
 
-### Text your Tesla to lock, charge, warm it up, or land the Roadster
+<p align="center"><img src="docs/hero.png" width="900" alt="The Roadster and the Cybertruck side by side on a pale studio field"></p>
 
-`text → Claude tool-use → Fleet API → your car`
-
-<img src="docs/banner.png" alt="roadster-api — radar sweep over a dark highway grid" width="832">
-
-</div>
-
----
-
-**Text your Roadster.**
-
-A self-hosted API key for your Tesla, and an assistant you text.
-"fly the kids to school." "come pick me up from work." "heat my car." "charge to 80."
+"warm it up." "where are you." "charge to 80." "pop the tailgate."
 It runs on Tesla's official Fleet API with nothing plugged into the car.
 Your own Tesla developer app is the key. This repo is the rest.
 
-<p align="center"><img src="ad/airtime-map.png" width="820" alt="Airtime: hours saved flying over traffic, drawn as arcs over Los Angeles"></p>
+| | |
+|---|---|
+| Hardware | none |
+| Cost | $0 a month for one car, inside Tesla's $10 credit |
+| Channel | Telegram, then SMS |
+| Model | Claude Sonnet 5 |
+| Tests | 158, no car needed |
 
 ## Works today
 
-- Every Fleet-API Tesla: Model S, 3, X, Y, Cybertruck.
-- Official Fleet API only. No hardware, no diag port, no jailbreak, no third-party cloud.
-- Your developer app is your API key. You register it once, pair the virtual key once from the Tesla app, and this server mints a local bearer key for anything that wants to talk to the car.
-- $0/month for one car. Tesla bills the Fleet API per call and gives every developer app a $10 monthly credit; a normal texting pattern stays inside it.
-- Telegram first, Twilio SMS second. One allow-listed chat. A PIN for unlock, trunk and frunk.
+| Model | Text it | Flight |
+|---|---|---|
+| Roadster | every command below | `land`, `hover`, `jump`, `thrust_mode` in the manifest, awaiting Tesla's endpoint |
+| Cybertruck | every command below; it has a bed, so "trunk" is the tailgate side | no |
+| Model S · 3 · X · Y | every command below | no |
+
+- Official Fleet API only. No diag port, no jailbreak, no third-party cloud.
+- Your developer app is your API key. Register it once, pair the virtual key once from the Tesla app, and this server mints a local bearer key for anything that wants to talk to the car.
+- Tesla bills the Fleet API per call and gives every developer app a $10 monthly credit. A normal texting pattern stays inside it.
+- One allow-listed chat. A PIN for unlock, trunk and frunk.
 - `freetessie` speaks the same REST paths as developer.tessie.com, so anything built for Tessie points here unchanged.
+
+### Cybertruck
+
+The VIN picks the profile. Position 4 is the model code, `C` is the Cybertruck, and [`src/roadster/vehicles.ts`](src/roadster/vehicles.ts) turns that into what the assistant is told: "The car is a Tesla Cybertruck, it has an open cargo bed."
+Every live command is the same as on any other Tesla. Flight commands are never offered; ask a Cybertruck to hover and it says plainly that it can't.
+Tonneau and Powershare commands are not in the manifest yet. Tessie exposes a tonneau command, but the exact Fleet API endpoint behind it is unverified, so nothing is claimed until it is.
 
 ## The Roadster
 
@@ -59,8 +65,8 @@ Plain English. The assistant picks the tool; the manifest is the full list.
 | send it to the office | `navigate` | `command/navigation_request` | live |
 | be ready by 7:30 | `depart_at` | `command/set_scheduled_departure` | live |
 | warm it up in 15 | `later` | app-side scheduler | live |
-| land on the roof | `land` | none yet | awaiting_fleet_api |
-| hover · jump the traffic · thrusters on | `hover` · `jump` · `thrust_mode` | none yet | awaiting_fleet_api |
+| land on the roof | `land` | none yet | awaiting_fleet_api, Roadster only |
+| hover · jump the traffic · thrusters on | `hover` · `jump` · `thrust_mode` | none yet | awaiting_fleet_api, Roadster only |
 
 Every "done" is a fresh state read, never the request. If the car does not confirm, the reply says what the re-read showed.
 
@@ -68,7 +74,9 @@ Every "done" is a fresh state read, never the request. If the car does not confi
 
 How many hours would flying have saved over the drives you actually made?
 
-`src/roadster/airtime.ts` takes each recorded drive (two endpoints, a duration), measures the straight line between them, and compares the time on the road with a flight: straight line at cruise speed plus a fixed takeoff-and-landing overhead. Anything the road lost is counted. It never goes negative.
+<p align="center"><img src="ad/airtime-map.png" width="820" alt="Airtime: hours saved flying over traffic, drawn as arcs over Los Angeles"></p>
+
+[`src/roadster/airtime.ts`](src/roadster/airtime.ts) takes each recorded drive (two endpoints, a duration), measures the straight line between them, and compares the time on the road with a flight: straight line at cruise speed plus a fixed takeoff-and-landing overhead. Anything the road lost is counted. It never goes negative.
 
 Two numbers are guesses, and the code and the page both say so: **160 km/h cruise** and **120 s per flight**. Tesla has published neither. Override them:
 
@@ -79,7 +87,7 @@ npm run airtime -- --cruise-kph 200 --overhead-s 90
 npx serve web                                   # then open /airtime.html
 ```
 
-The demo above comes out at about 51 hours over 8 weeks. Real drives come from `freetessie`'s history store, which records both endpoints of every drive it observes.
+The demo comes out at about 51 hours over 8 weeks. Real drives come from `freetessie`'s history store, which records both endpoints of every drive it observes.
 
 ## Setup
 
@@ -121,15 +129,16 @@ The Roadster's flight commands are not an exception. They route to one tool, `ro
 
 <p align="center"><a href="ad/roadster.mp4"><img src="ad/poster.png" width="820" alt="The Roadster gliding over stopped freeway traffic at golden hour"></a></p>
 
-[ad/roadster.mp4](ad/roadster.mp4): 35 seconds, 16:9, no voice. Text the car "fly the kids to school", see it answer, watch it fly in over the bus and land. Then "come pick me up from work" and it glides over the freeway. Both flight shots are generated from frames of the real unveil car and checked against them side by side; the thruster sound is from Tesla's own stream.
-Made with Veo 3.1 and Nano Banana on Higgsfield (real-car references), a Chrome-rendered Messages scene on a photoreal phone plate, Sonilo music.
+[ad/roadster.mp4](ad/roadster.mp4): 35 seconds, 16:9, no voice. Text the car "fly the kids to school", see it answer, watch it fly in over the bus and land. Then "come pick me up from work" and it glides over the freeway.
+Both flight shots are generated from frames of the real unveil car and checked against them side by side. The thruster sound is from Tesla's own stream.
+Made with Veo 3.1 and Nano Banana on Higgsfield, a Chrome-rendered Messages scene on a photoreal phone plate, Sonilo music.
 It is a concept film and says so on the end card: the flight commands await Tesla's endpoints.
 
 ## Layout
 
 ```
 src/agent/        Claude tool-use loop, PIN gate, the never-do refusal
-src/roadster/     manifest.ts · airtime.ts · airtimeHistory.ts
+src/roadster/     manifest.ts · vehicles.ts · airtime.ts · airtimeHistory.ts
 src/freetessie/   Tessie-compatible server on the official Fleet API
 src/tesla/        VehicleAdapter (Tessie shape) + fakes
 src/channels/     Telegram, Twilio
@@ -141,3 +150,5 @@ docs/             freetessie brief, research, setup runbook, review prompt
 
 `SPEC.md` has the user stories, `ARCHITECTURE.md` the sequence diagrams.
 `docs/FREETESSIE-BRIEF.md` has the Fleet API facts with sources.
+
+<!-- Social preview: upload docs/social.png in Settings → Social preview. -->

@@ -15,6 +15,7 @@ import { TelegramChannel } from "./channels/telegram.ts";
 import { TwilioChannel } from "./channels/twilio.ts";
 import type { Channel, InboundMessage } from "./channels/channel.ts";
 import { handleInbound, hashPin, type AgentDeps } from "./agent/agent.ts";
+import { modelFromVin } from "./roadster/vehicles.ts";
 import { scheduleTrigger, cancelLatestPending, type Trigger } from "./scheduler/triggers.ts";
 import { startPoller } from "./scheduler/poller.ts";
 import type { AnthropicClientLike, AnthropicCreateParams, AnthropicResponse } from "./agent/anthropic.ts";
@@ -96,6 +97,8 @@ async function main(): Promise<void> {
   //   - FAKE_TESSIE=1 (no FLEET_MODE): the existing FakeTessieServer path, unchanged.
   //   - neither: the real api.tessie.com, unchanged.
   let adapter: VehicleAdapter;
+  // The VIN picks the vehicle profile the agent is told about (Cybertruck, Model Y, ...).
+  let vin = "";
   let fakeServerStop: (() => Promise<void>) | undefined;
   let freetessie: FreeTessie | undefined;
   let freetessieDb: DatabaseSync | undefined;
@@ -134,7 +137,8 @@ async function main(): Promise<void> {
       );
     }
 
-    adapter = new TessieAdapter(localKey, config.vin, `http://127.0.0.1:${boundPort}`);
+    vin = config.vin;
+    adapter = new TessieAdapter(localKey, vin, `http://127.0.0.1:${boundPort}`);
     freetessieStop = async (): Promise<void> => {
       await freetessie!.server.stop();
       if (fakeFleetStop) await fakeFleetStop();
@@ -143,15 +147,20 @@ async function main(): Promise<void> {
   } else if (fakeTessie) {
     const fake = createFakeTessieServer();
     const { url } = await fake.start();
-    adapter = new TessieAdapter("fake-token", "TEST000000000VIN", url);
+    vin = "TEST000000000VIN";
+    adapter = new TessieAdapter("fake-token", vin, url);
     fakeServerStop = fake.stop;
   } else {
-    adapter = new TessieAdapter(requireEnv("TESSIE_TOKEN"), requireEnv("TESSIE_VIN"));
+    vin = requireEnv("TESSIE_VIN");
+    adapter = new TessieAdapter(requireEnv("TESSIE_TOKEN"), vin);
   }
 
   const client = adaptAnthropicClient(anthropicApiKey);
   const scheduler = schedulerFor(db);
-  const deps: AgentDeps = { client, adapter, scheduler, db, userPinHash, ownerTimeZone };
+  // An unrecognised VIN (the fake server's, or a future scheme) keeps the Roadster prompt.
+  const decoded = modelFromVin(vin);
+  const vehicleModel = decoded === "unknown" ? "roadster" : decoded;
+  const deps: AgentDeps = { client, adapter, scheduler, db, userPinHash, ownerTimeZone, vehicleModel };
 
   // 4. Construct channels present in env, wire each one's onMessage to
   // handleInbound -> Channel.send.

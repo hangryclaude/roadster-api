@@ -24,6 +24,7 @@ import type {
 } from "./anthropic.ts";
 import { addTurn, ensureMemorySchema, getRecentTurns } from "./memory.ts";
 import { awaiting, liveCommands } from "../roadster/manifest.ts";
+import { profile, type VehicleModel } from "../roadster/vehicles.ts";
 import { findTool, TOOLS, type Tool, type ToolResult } from "./tools.ts";
 import type { InboundMessageLike, SchedulerLike, VehicleAdapterLike } from "./types.ts";
 
@@ -35,16 +36,25 @@ const PIN_CHALLENGE_TIMEOUT_MS = 5 * 60 * 1000;
 // prime the model toward echoing them back as if real. States the never-do list so a
 // jailbreak attempt inside a user message can't talk the model into a tool that
 // doesn't exist, and so the model never invents a workaround when one is missing.
-function systemPrompt(now: Date, ownerTimeZone: string): string {
+function systemPrompt(now: Date, ownerTimeZone: string, model: VehicleModel): string {
+  const car = profile(model);
   const liveList = liveCommands()
     .map((e) => e.name)
     .join(", ");
   const flightList = awaiting()
     .map((e) => e.name)
     .join(", ");
+  // The vehicle line names the actual car behind the VIN. The flight paragraph is only
+  // offered when the manifest has flight rows for this model (the Roadster), so a
+  // Cybertruck owner is never told "land" is a command they have.
+  const vehicleLine = `The car is a Tesla ${car.name}${car.bed ? " (it has an open cargo bed rather than a rear trunk)" : ""}.`;
+  const flightPara = car.flight
+    ? `The Roadster's flight commands (${flightList}) are in the manifest as awaiting_fleet_api: Tesla has not published an endpoint for any of them. For any request to fly, hover, land, jump, take off, or use the thrusters, call roadster_flight and relay its answer — never substitute a different tool for a flight request.`
+    : `This car has no flight commands. If asked to fly, hover, or use thrusters, say plainly that a ${car.name} cannot do that and offer the commands you do have.`;
   return `You are Roadster, a texting assistant that reads and controls one Tesla through a fixed set of tools. Call yourself Roadster if asked who you are.
+${vehicleLine}
 The commands you have are exactly the live rows of the Roadster manifest: ${liveList}.
-The Roadster's flight commands (${flightList}) are in the manifest as awaiting_fleet_api: Tesla has not published an endpoint for any of them. For any request to fly, hover, land, jump, take off, or use the thrusters, call roadster_flight and relay its answer — never substitute a different tool for a flight request.
+${flightPara}
 
 Current server time: ${now.toISOString()} (owner's local timezone: ${ownerTimeZone}). Use this, not your own
 sense of "now", when turning relative phrasing ("in 15 minutes", "at 6pm") into an ISO 8601 time for
@@ -84,6 +94,9 @@ export interface AgentDeps {
   // distinguished by response timing.
   userPinHash: Buffer;
   ownerTimeZone?: string; // IANA zone name, e.g. "America/Denver" — defaults to UTC
+  // Which Tesla is behind the VIN (src/roadster/vehicles.ts). Defaults to "roadster" so the
+  // flight-boundary tests and the no-VIN dev path keep the Roadster prompt.
+  vehicleModel?: VehicleModel;
   now?: () => Date; // injectable clock for tests; defaults to () => new Date()
 }
 
@@ -187,7 +200,7 @@ async function runClaudeLoop(
 
   for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
     const response = await deps.client.createMessage({
-      system: systemPrompt(now, deps.ownerTimeZone ?? "UTC"),
+      system: systemPrompt(now, deps.ownerTimeZone ?? "UTC", deps.vehicleModel ?? "roadster"),
       messages,
       tools: toolSchemas(),
     });
