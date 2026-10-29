@@ -1,4 +1,16 @@
-# Roadster API
+<div align="center">
+
+# 🚗 Roadster API
+
+### Text your Tesla to lock, charge, warm it up, or land the Roadster
+
+`text → Claude tool-use → Fleet API → your car`
+
+<img src="docs/banner.png" alt="roadster-api — radar sweep over a dark highway grid" width="832">
+
+</div>
+
+---
 
 **Text your Roadster.**
 
