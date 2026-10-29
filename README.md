@@ -124,7 +124,7 @@ The Roadster's flight commands are not an exception. They route to one tool, `ro
 
 <p align="center"><a href="ad/roadster.mp4"><img src="ad/poster.png" width="820" alt="The Roadster gliding over stopped freeway traffic at golden hour"></a></p>
 
-[ad/roadster.mp4](ad/roadster.mp4): 35 seconds, 16:9, no voice. Text the car "fly the kids to school", see it answer, watch it fly in over the bus and land. Then "come pick me up from work" and it glides over the freeway.
+[ad/roadster.mp4](ad/roadster.mp4): 50 seconds, 16:9, no voice. The last 20 seconds are the spec sheet, cut on the beat: $0 a month, 0 hardware, official Fleet API, 1 tap, $0.001 per command, Claude Sonnet 5, 158 tests, never drives. Text the car "fly the kids to school", see it answer, watch it fly in over the bus and land. Then "come pick me up from work" and it glides over the freeway.
 Both flight shots are generated from frames of the real unveil car and checked against them side by side. The thruster sound is from Tesla's own stream.
 Made with Veo 3.1 and Nano Banana on Higgsfield, a Chrome-rendered Messages scene on a photoreal phone plate, Sonilo music.
 It is a concept film and says so on the end card: the flight commands await Tesla's endpoints.

@@ -1,6 +1,6 @@
 # X post — Roadster API (Angus posts)
 
-Attach: `final/roadster_v3.mp4` (35 s, 16:9, H.264). Poster frame: `final/poster_v3.png`.
+Attach: `final/roadster_v4.mp4` (50 s, 16:9, H.264). Poster frame: `final/poster_v3.png`. Music is the TikTok sound "3 Strikes" (Andree Son) from the reference edit: fine as a TikTok sound, not cleared for X; swap to music/bed.mp3 (Sonilo, ours) if posting on X with audio matters.
 
 ## Main post
 
