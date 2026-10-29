@@ -122,9 +122,9 @@ The Roadster's flight commands are not an exception. They route to one tool, `ro
 
 ## The film
 
-<p align="center"><a href="ad/roadster.mp4"><img src="ad/poster.png" width="820" alt="The Roadster parked on an iPhone"></a></p>
+<p align="center"><a href="ad/roadster.mp4"><img src="ad/poster.png" width="820" alt="The Roadster parked on a flat iPhone, seen from above"></a></p>
 
-[ad/roadster.mp4](ad/roadster.mp4): 25 seconds, 16:9, no voice. You text "drive my kids to school", the camera dives through the reply into a glass world of bubbles, the Roadster is parked on the phone, drives off it and down the street to the school.
+[ad/roadster.mp4](ad/roadster.mp4): 21 seconds, 16:9, no voice. The phone lies flat. You text "drive my kids to school", the Roadster answers, then it texts back a car, which appears on the screen. The angle swaps, it drives off the phone and down the street to the school.
 Both flight shots are generated from frames of the real unveil car and checked against them side by side. The thruster sound is from Tesla's own stream.
 Made with Veo 3.1 and Nano Banana on Higgsfield, a Chrome-rendered Messages scene on a photoreal phone plate, Sonilo music.
 It is a concept film and says so on the end card: the flight commands await Tesla's endpoints.

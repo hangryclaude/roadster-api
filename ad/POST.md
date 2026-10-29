@@ -1,6 +1,6 @@
 # X post — Roadster API (Angus posts)
 
-Attach: `final/roadster_v5.mp4` (25 s, 16:9, H.264). Poster frame: `stills/phone_car.png`. Music is the TikTok sound "3 Strikes" (Andree Son) from the reference edit: fine as a TikTok sound, not cleared for X; swap to music/bed.mp3 (Sonilo, ours) if posting on X with audio matters.
+Attach: `final/roadster_v6.mp4` (21 s, 16:9, H.264). Poster frame: `stills/flat_b.png`. Music is the TikTok sound "3 Strikes" (Andree Son) from the reference edit: fine as a TikTok sound, not cleared for X; swap to music/bed.mp3 (Sonilo, ours) if posting on X with audio matters.
 
 ## Main post
 
