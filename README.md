@@ -3,7 +3,7 @@
 **Text your Roadster.**
 
 A self-hosted API key for your Tesla, and an assistant you text.
-"warm it up." "where are you." "charge to 80." "land on the roof."
+"fly the kids to school." "come pick me up from work." "heat my car." "charge to 80."
 It runs on Tesla's official Fleet API with nothing plugged into the car.
 Your own Tesla developer app is the key. This repo is the rest.
 
@@ -107,10 +107,10 @@ The Roadster's flight commands are not an exception. They route to one tool, `ro
 
 ## The film
 
-<p align="center"><a href="ad/roadster.mp4"><img src="ad/poster.png" width="820" alt="The Roadster landed on a rooftop pad at dusk"></a></p>
+<p align="center"><a href="ad/roadster.mp4"><img src="ad/poster.png" width="820" alt="The Roadster settling in the drop-off lane of a school"></a></p>
 
-[ad/roadster.mp4](ad/roadster.mp4): 61 seconds, 16:9, no voice. Text the car "land on the roof", watch it leave the traffic behind, count the hours.
-Storyboard: [ad/STORYBOARD.md](ad/STORYBOARD.md). Made with Veo 3.1 and Nano Banana on Higgsfield, Chrome-rendered screens, Sonilo music.
+[ad/roadster.mp4](ad/roadster.mp4): 30 seconds, 16:9, no voice. Text the car "fly the kids to school", see it answer, then land at the school. The flight itself is Tesla's own unveil footage; the school landing is generated from frames of the real car.
+Made with Veo 3.1 and Nano Banana on Higgsfield (real-car references), a Chrome-rendered Messages scene on a photoreal phone plate, Sonilo music.
 It is a concept film and says so on the end card: the flight commands await Tesla's endpoints.
 
 ## Layout
