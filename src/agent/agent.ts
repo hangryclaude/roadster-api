@@ -46,8 +46,8 @@ function systemPrompt(now: Date, ownerTimeZone: string, model: VehicleModel): st
     .join(", ");
   // The vehicle line names the actual car behind the VIN. The flight paragraph is only
   // offered when the manifest has flight rows for this model (the Roadster), so a
-  // Cybertruck owner is never told "land" is a command they have.
-  const vehicleLine = `The car is a Tesla ${car.name}${car.bed ? " (it has an open cargo bed rather than a rear trunk)" : ""}.`;
+  // Model Y owner is never told "land" is a command they have.
+  const vehicleLine = `The car is a Tesla ${car.name}.`;
   const flightPara = car.flight
     ? `The Roadster's flight commands (${flightList}) are in the manifest as awaiting_fleet_api: Tesla has not published an endpoint for any of them. For any request to fly, hover, land, jump, take off, or use the thrusters, call roadster_flight and relay its answer — never substitute a different tool for a flight request.`
     : `This car has no flight commands. If asked to fly, hover, or use thrusters, say plainly that a ${car.name} cannot do that and offer the commands you do have.`;

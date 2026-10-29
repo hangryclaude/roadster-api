@@ -1,4 +1,4 @@
-// The vehicle profile reaches the system prompt: a Cybertruck is named as such and is
+// The vehicle profile reaches the system prompt: a Model Y is named as such and is
 // never offered the Roadster's flight commands; the default stays the Roadster.
 
 import assert from "node:assert/strict";
@@ -9,18 +9,17 @@ import { fakeAdapter, fakeScheduler, scriptedClient } from "./helpers.ts";
 
 const endTurn = (text: string) => ({ stop_reason: "end_turn" as const, content: [{ type: "text" as const, text }] });
 
-test("a Cybertruck's system prompt names the Cybertruck and offers no flight commands", async () => {
+test("a Model Y's system prompt names the Model Y and offers no flight commands", async () => {
   __resetPendingPinsForTests();
   const client = scriptedClient([endTurn("Hi.")]);
   const db = new DatabaseSync(":memory:");
   try {
     await handleInbound(
-      { client, adapter: fakeAdapter(), scheduler: fakeScheduler(), db, userPinHash: hashPin("4471"), vehicleModel: "cybertruck" },
+      { client, adapter: fakeAdapter(), scheduler: fakeScheduler(), db, userPinHash: hashPin("4471"), vehicleModel: "model_y" },
       { channel: "telegram", chatId: "v1", text: "hi" },
     );
     const system = client.calls[0].system;
-    assert.match(system, /Tesla Cybertruck/);
-    assert.match(system, /cargo bed/);
+    assert.match(system, /Tesla Model Y/);
     assert.match(system, /no flight commands/);
     assert.doesNotMatch(system, /\bland, hover, jump, thrust_mode\b/);
     assert.doesNotMatch(system, /call roadster_flight/);

@@ -97,7 +97,7 @@ async function main(): Promise<void> {
   //   - FAKE_TESSIE=1 (no FLEET_MODE): the existing FakeTessieServer path, unchanged.
   //   - neither: the real api.tessie.com, unchanged.
   let adapter: VehicleAdapter;
-  // The VIN picks the vehicle profile the agent is told about (Cybertruck, Model Y, ...).
+  // The VIN picks the vehicle profile the agent is told about (Model Y, Roadster, ...).
   let vin = "";
   let fakeServerStop: (() => Promise<void>) | undefined;
   let freetessie: FreeTessie | undefined;

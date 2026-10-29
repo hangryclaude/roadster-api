@@ -1,10 +1,10 @@
 <p align="center"><img src="docs/hero-title.png" width="900" alt="Roadster API — Text your Tesla"></p>
 
-<p align="center">A self-hosted API key for your Tesla, and an assistant you text.<br>Roadster, Cybertruck, S, 3, X, Y.</p>
+<p align="center">A self-hosted API key for your Tesla, and an assistant you text.<br>Roadster, S, 3, X, Y.</p>
 
-<p align="center"><img src="docs/hero.png" width="900" alt="The Roadster and the Cybertruck side by side on a pale studio field"></p>
+<p align="center"><img src="docs/hero.png" width="900" alt="The Roadster on a pale studio field"></p>
 
-"warm it up." "where are you." "charge to 80." "pop the tailgate."
+"warm it up." "where are you." "charge to 80." "fly the kids to school."
 It runs on Tesla's official Fleet API with nothing plugged into the car.
 Your own Tesla developer app is the key. This repo is the rest.
 
@@ -21,7 +21,6 @@ Your own Tesla developer app is the key. This repo is the rest.
 | Model | Text it | Flight |
 |---|---|---|
 | Roadster | every command below | `land`, `hover`, `jump`, `thrust_mode` in the manifest, awaiting Tesla's endpoint |
-| Cybertruck | every command below; it has a bed, so "trunk" is the tailgate side | no |
 | Model S · 3 · X · Y | every command below | no |
 
 - Official Fleet API only. No diag port, no jailbreak, no third-party cloud.
@@ -30,11 +29,7 @@ Your own Tesla developer app is the key. This repo is the rest.
 - One allow-listed chat. A PIN for unlock, trunk and frunk.
 - `freetessie` speaks the same REST paths as developer.tessie.com, so anything built for Tessie points here unchanged.
 
-### Cybertruck
-
-The VIN picks the profile. Position 4 is the model code, `C` is the Cybertruck, and [`src/roadster/vehicles.ts`](src/roadster/vehicles.ts) turns that into what the assistant is told: "The car is a Tesla Cybertruck, it has an open cargo bed."
-Every live command is the same as on any other Tesla. Flight commands are never offered; ask a Cybertruck to hover and it says plainly that it can't.
-Tonneau and Powershare commands are not in the manifest yet. Tessie exposes a tonneau command, but the exact Fleet API endpoint behind it is unverified, so nothing is claimed until it is.
+The VIN picks the profile. Position 4 is the model code, and [`src/roadster/vehicles.ts`](src/roadster/vehicles.ts) turns that into what the assistant is told. Every live command is the same on every model. Flight commands are only offered on a Roadster; ask a Model Y to hover and it says plainly that it can't.
 
 ## The Roadster
 
