@@ -119,9 +119,9 @@ The Roadster's flight commands are not an exception. They route to one tool, `ro
 
 ## The film
 
-<p align="center"><a href="ad/roadster.mp4"><img src="ad/poster.png" width="820" alt="The Roadster settling in the drop-off lane of a school"></a></p>
+<p align="center"><a href="ad/roadster.mp4"><img src="ad/poster.png" width="820" alt="The Roadster gliding over stopped freeway traffic at golden hour"></a></p>
 
-[ad/roadster.mp4](ad/roadster.mp4): 30 seconds, 16:9, no voice. Text the car "fly the kids to school", see it answer, then land at the school. The flight itself is Tesla's own unveil footage; the school landing is generated from frames of the real car.
+[ad/roadster.mp4](ad/roadster.mp4): 35 seconds, 16:9, no voice. Text the car "fly the kids to school", see it answer, watch it fly in over the bus and land. Then "come pick me up from work" and it glides over the freeway. Both flight shots are generated from frames of the real unveil car and checked against them side by side; the thruster sound is from Tesla's own stream.
 Made with Veo 3.1 and Nano Banana on Higgsfield (real-car references), a Chrome-rendered Messages scene on a photoreal phone plate, Sonilo music.
 It is a concept film and says so on the end card: the flight commands await Tesla's endpoints.
 

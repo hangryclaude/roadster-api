@@ -1,6 +1,6 @@
 # X post — Roadster API (Angus posts)
 
-Attach: `final/roadster_v2.mp4` (30 s, 16:9, H.264). Poster frame: `final/poster_v2.png`.
+Attach: `final/roadster_v3.mp4` (35 s, 16:9, H.264). Poster frame: `final/poster_v3.png`.
 
 ## Main post
 
@@ -26,5 +26,5 @@ github.com/hangryclaude/roadster-api
    Tessie-compatible server on the official Fleet API. $0/month inside Tesla's $10 credit.
 2. What it never does: steer, drive, summon, Autopilot. Hard-coded refusal. The flight
    commands sit in the manifest as `awaiting_fleet_api` until Tesla publishes them.
-3. The flight in the film is Tesla's own unveil footage. The school landing is generated
-   from frames of the real car. Concept film, and the end card says so.
+3. The flight shots are generated from frames of the real unveil car (the school fly-in and the freeway glide)
+   and checked against them side by side. Concept film, and the end card says so.
